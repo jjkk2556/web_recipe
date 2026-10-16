@@ -4,7 +4,195 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kimi 食谱工坊 — AI 食谱共创社区</title>
-<link rel="stylesheet" href="style.css">
+<style>
+/* ========== Kimi 食谱工坊 · 极简风格 ========== */
+:root {
+  --ink: #1a1a1a;
+  --muted: #8a8a8a;
+  --line: #e8e6e1;
+  --accent: #e8622c;
+  --accent-soft: #fdf1ea;
+  --bg: #fbfaf8;
+  --radius: 14px;
+  --error: #c0392b;
+  font-size: 16px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg); color: var(--ink); line-height: 1.7;
+}
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(251, 250, 248, .88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.header-inner {
+  max-width: 1080px; margin: 0 auto; padding: 0 24px;
+  height: 64px; display: flex; align-items: center; justify-content: space-between;
+}
+.logo { font-size: 1.15rem; font-weight: 700; color: var(--ink); text-decoration: none; letter-spacing: .02em; }
+.logo em { font-style: normal; color: var(--accent); }
+.nav { display: flex; align-items: center; gap: 6px; }
+.nav a {
+  color: var(--muted); text-decoration: none; font-size: .95rem;
+  padding: 6px 14px; border-radius: 999px; transition: all .2s;
+}
+.nav a:hover { color: var(--ink); background: #f1efeb; }
+.nav a.active { color: #fff; background: var(--ink); }
+.nav-auth { display: flex; align-items: center; gap: 10px; margin-left: 14px; }
+.nav-user { font-size: .9rem; color: var(--ink); }
+.btn-sm { padding: 7px 18px !important; font-size: .88rem !important; }
+
+main { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; }
+.view { display: none; animation: fade .3s ease; }
+.view.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.hero { padding: 88px 0 40px; }
+.hero h1 { font-size: clamp(2.1rem, 5vw, 3.2rem); line-height: 1.25; letter-spacing: -.02em; font-weight: 800; }
+.hero-sub { color: var(--muted); margin-top: 14px; font-size: 1.05rem; }
+
+.panel { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 24px; margin-bottom: 24px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-wide { grid-column: 1 / -1; }
+.field span { font-size: .88rem; color: var(--muted); }
+.field span i { font-style: normal; color: var(--accent); margin-left: 4px; font-size: .78rem; }
+.field input, .field textarea {
+  border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px;
+  font-size: .95rem; font-family: inherit; background: #fff; color: var(--ink);
+  transition: border-color .2s; resize: vertical;
+}
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
+.field input.invalid { border-color: var(--error); }
+
+.btn-primary {
+  background: var(--ink); color: #fff; border: none; border-radius: 999px;
+  padding: 13px 34px; font-size: 1rem; cursor: pointer; transition: transform .15s, background .2s;
+}
+.btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.btn-ghost {
+  background: transparent; color: var(--ink); border: 1px solid var(--line);
+  border-radius: 999px; padding: 9px 20px; font-size: .9rem; cursor: pointer; transition: all .2s;
+}
+.btn-ghost:hover { border-color: var(--ink); }
+.btn-accent { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.btn-accent:hover { border-color: var(--accent); }
+.status { margin-top: 12px; font-size: .88rem; color: var(--muted); min-height: 1.4em; }
+.status.error { color: var(--error); }
+.hidden { display: none !important; }
+
+#result-area { margin-top: 28px; }
+.recipe-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.recipe-head h3 { font-size: 1.6rem; letter-spacing: -.01em; }
+.recipe-desc { color: var(--muted); margin: 6px 0 18px; }
+.badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.badge { font-size: .78rem; padding: 4px 12px; border-radius: 999px; background: #f3f1ed; color: #555; }
+.badge.hot { background: var(--accent-soft); color: var(--accent); }
+.recipe-cols { display: grid; grid-template-columns: 300px 1fr; gap: 32px; }
+@media (max-width: 760px) { .recipe-cols { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } }
+.sub-title { font-size: .82rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 12px; }
+.ing-list { list-style: none; }
+.ing-list li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); font-size: .93rem; }
+.ing-list li b { font-weight: 500; }
+.ing-list li span { color: var(--muted); }
+.steps { counter-reset: step; list-style: none; }
+.steps li { display: flex; gap: 14px; padding: 10px 0; }
+.steps li::before {
+  counter-increment: step; content: counter(step);
+  flex: none; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--ink); color: #fff; font-size: .8rem;
+  display: flex; align-items: center; justify-content: center; margin-top: 3px;
+}
+.tips { background: #f7f5f2; border-radius: 10px; padding: 16px 20px; margin-top: 20px; font-size: .9rem; }
+.tips li { margin-left: 18px; color: #555; }
+.result-actions { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+
+.page-head { padding: 64px 0 32px; }
+.page-head h2 { font-size: 2rem; letter-spacing: -.02em; }
+.muted { color: var(--muted); }
+.recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.card {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; cursor: pointer; transition: transform .18s, box-shadow .18s;
+  display: flex; flex-direction: column;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.07); }
+.card h4 { font-size: 1.15rem; margin-bottom: 6px; }
+.card .card-desc {
+  color: var(--muted); font-size: .88rem; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-meta { display: flex; gap: 14px; margin-top: 16px; font-size: .8rem; color: var(--muted); }
+.card .remix-tag {
+  display: inline-block; font-size: .72rem; color: var(--accent);
+  background: var(--accent-soft); padding: 2px 10px; border-radius: 999px; margin-bottom: 8px; width: fit-content;
+}
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 80px 0; color: var(--muted); }
+
+.modal {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(26,26,26,.45); backdrop-filter: blur(4px);
+  display: flex; align-items: flex-start; justify-content: center; padding: 5vh 16px; overflow-y: auto;
+}
+.modal-box {
+  background: var(--bg); border-radius: 18px; max-width: 760px; width: 100%;
+  padding: 40px; position: relative; animation: fade .25s ease;
+}
+@media (max-width: 640px) { .modal-box { padding: 26px; } }
+.modal-close {
+  position: absolute; top: 16px; right: 20px; border: none; background: none;
+  font-size: 1.8rem; cursor: pointer; color: var(--muted); line-height: 1;
+}
+.modal-close:hover { color: var(--ink); }
+
+.comments { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 22px; }
+.comment { padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: .9rem; }
+.comment b { font-weight: 600; }
+.comment time { color: var(--muted); font-size: .78rem; margin-left: 8px; }
+.comment-form { display: flex; gap: 10px; margin-top: 14px; }
+.comment-form input {
+  flex: 1; border: 1px solid var(--line); border-radius: 999px; padding: 9px 18px; font-size: .9rem;
+}
+.comment-form input:focus { outline: none; border-color: var(--accent); }
+.remix-box { background: var(--accent-soft); border-radius: 12px; padding: 20px; margin-top: 26px; }
+.remix-box textarea {
+  width: 100%; border: 1px solid #f0d9cc; border-radius: 10px; padding: 12px 14px;
+  font-family: inherit; font-size: .92rem; background: #fff; resize: vertical;
+}
+.remix-box textarea:focus { outline: none; border-color: var(--accent); }
+
+/* ---------- 登录 / 注册 ---------- */
+.auth-box { max-width: 420px; text-align: center; }
+.auth-tabs { display: flex; gap: 28px; justify-content: center; margin-bottom: 28px; }
+.auth-tab {
+  background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--muted);
+  padding: 4px 2px; border-bottom: 2px solid transparent; transition: all .2s;
+}
+.auth-tab.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--accent); }
+#auth-form { text-align: left; display: flex; flex-direction: column; gap: 16px; }
+.auth-error { color: var(--error); font-size: .85rem; min-height: 1.3em; text-align: center; }
+.auth-submit { width: 100%; margin-top: 4px; }
+.auth-switch { margin-top: 18px; font-size: .88rem; color: var(--muted); }
+.auth-switch a { color: var(--accent); cursor: pointer; text-decoration: none; }
+.account-card { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
+.account-avatar {
+  width: 56px; height: 56px; border-radius: 50%; background: var(--ink); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700;
+}
+.account-name { font-size: 1.2rem; font-weight: 700; }
+.account-since { font-size: .82rem; color: var(--muted); }
+
+.backend-warning {
+  margin-top: 16px; background: #fdecea; color: #b03a2e;
+  border: 1px solid #f5c6c0; border-radius: 10px;
+  padding: 10px 18px; font-size: .88rem;
+}
+.site-footer { text-align: center; padding: 40px 0; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line); }
+</style>
 </head>
 <body>
 
@@ -15,95 +203,94 @@
       <a href="#" data-view="create" class="active">AI 创作</a>
       <a href="#" data-view="community">社区</a>
       <a href="#" data-view="settings">设置</a>
+      <div class="nav-auth" id="nav-auth"></div>
     </nav>
   </div>
 </header>
 
 <main>
-
-  <!-- ========== 视图：AI 创作 ========== -->
+  <div id="backend-warning" class="backend-warning hidden"></div>
   <section id="view-create" class="view active">
     <div class="hero">
       <h1>说出你的食材，<br>剩下的交给 Kimi。</h1>
       <p class="hero-sub">AI 生成原创食谱 · 一键发布社区 · 众人接力改良</p>
     </div>
-
     <div class="panel form-panel">
       <div class="form-grid">
         <label class="field field-wide">
           <span>手头有什么食材？<i>必填</i></span>
           <textarea id="f-ingredients" rows="2" placeholder="例如：鸡胸肉、西兰花、蒜、生抽…"></textarea>
         </label>
-        <label class="field">
-          <span>菜系 / 口味</span>
-          <input id="f-cuisine" placeholder="例如：川菜、清淡、日式…">
-        </label>
-        <label class="field">
-          <span>份量</span>
-          <input id="f-servings" placeholder="例如：2人份">
-        </label>
-        <label class="field">
-          <span>风格</span>
-          <input id="f-style" placeholder="例如：减脂餐、家常快手、宴客">
-        </label>
-        <label class="field field-wide">
-          <span>其他要求</span>
-          <input id="f-extra" placeholder="例如：不用辣、少油、能提前备好…">
-        </label>
+        <label class="field"><span>菜系 / 口味</span><input id="f-cuisine" placeholder="例如：川菜、清淡、日式…"></label>
+        <label class="field"><span>份量</span><input id="f-servings" placeholder="例如：2人份"></label>
+        <label class="field"><span>风格</span><input id="f-style" placeholder="例如：减脂餐、家常快手、宴客"></label>
+        <label class="field field-wide"><span>其他要求</span><input id="f-extra" placeholder="例如：不用辣、少油、能提前备好…"></label>
       </div>
       <button id="btn-generate" class="btn-primary">✨ 生成食谱</button>
       <p id="generate-status" class="status"></p>
     </div>
-
     <div id="result-area" class="hidden">
-      <div class="panel result-panel" id="result-panel"><!-- JS 填充 --></div>
+      <div class="panel result-panel" id="result-panel"></div>
     </div>
   </section>
 
-  <!-- ========== 视图：社区 ========== -->
   <section id="view-community" class="view">
     <div class="page-head">
       <h2>社区食谱</h2>
       <p class="muted">每一份食谱都可以被继续改良 — 这正是它有趣的地方。</p>
     </div>
-    <div id="recipe-list" class="recipe-grid"><!-- JS 填充 --></div>
+    <div id="recipe-list" class="recipe-grid"></div>
   </section>
 
-  <!-- ========== 视图：设置 ========== -->
   <section id="view-settings" class="view">
     <div class="page-head">
       <h2>设置</h2>
-      <p class="muted">配置 Kimi API，解锁 AI 创作能力。</p>
     </div>
     <div class="panel form-panel settings-panel">
-      <label class="field field-wide">
-        <span>Kimi API Key</span>
-        <input id="s-key" type="password" placeholder="sk-…（从 platform.moonshot.cn 获取）">
-      </label>
-      <label class="field">
-        <span>模型</span>
-        <input id="s-model" placeholder="kimi-latest">
-      </label>
-      <label class="field field-wide">
-        <span>API 地址</span>
-        <input id="s-base" placeholder="https://api.moonshot.cn/v1">
-      </label>
-      <label class="field">
-        <span>你的昵称</span>
-        <input id="s-author" placeholder="匿名厨友">
-      </label>
-      <button id="btn-save-settings" class="btn-primary">保存设置</button>
-      <p id="settings-status" class="status"></p>
+      <div id="account-box"></div>
+      <p class="sub-title">服务端状态</p>
+      <p id="server-status" class="status"></p>
+      <p class="muted" style="font-size:.85rem;margin-top:6px">
+        API Key 属于服务端密钥，请在 <code>backend/.env</code> 中配置
+        <code>KIMI_API_KEY</code> 后重启服务，切勿在网页中填写。
+      </p>
     </div>
   </section>
-
 </main>
 
 <!-- 食谱详情弹层 -->
 <div id="modal" class="modal hidden">
   <div class="modal-box">
     <button class="modal-close" id="modal-close">×</button>
-    <div id="modal-body"><!-- JS 填充 --></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- 登录 / 注册弹窗 -->
+<div id="auth-modal" class="modal hidden">
+  <div class="modal-box auth-box">
+    <button class="modal-close" id="auth-close">×</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login" type="button">登录</button>
+      <button class="auth-tab" data-tab="register" type="button">注册</button>
+    </div>
+    <form id="auth-form" novalidate onsubmit="return false">
+      <label class="field">
+        <span>用户名</span>
+        <input id="a-username" autocomplete="username" placeholder="2-20 位中英文、数字或下划线" maxlength="20">
+      </label>
+      <label class="field">
+        <span>密码</span>
+        <input id="a-password" type="password" autocomplete="current-password" placeholder="至少 6 位" maxlength="72">
+      </label>
+      <label class="field hidden" id="a-confirm-field">
+        <span>确认密码</span>
+        <input id="a-confirm" type="password" autocomplete="new-password" placeholder="再次输入密码" maxlength="72">
+      </label>
+      <p class="auth-error" id="auth-error"></p>
+      <button class="btn-primary auth-submit" id="auth-submit" type="submit">登 录</button>
+    </form>
+    <p class="auth-switch" id="auth-switch"></p>
   </div>
 </div>
 
@@ -111,6 +298,364 @@
   <p>Kimi 食谱工坊 · 简约 · 共创 · 再改良</p>
 </footer>
 
-<script src="app.js"></script>
+<script>
+/* ========== Kimi 食谱工坊 · 前端逻辑 ========== */
+const $ = s => document.querySelector(s);
+/* ===================== 部署配置（按实际情况填写）===================== */
+/* 本地联调：API_BASE 留空，fetch 走相对路径访问本机后端
+   线上部署：前端在 GitHub Pages，后端在腾讯云云托管，配置方式见 README「部署」章节 */
+const API_BASE = "";                                                // 例："https://xxx.ap-shanghai.app.tcloudbaseapp.com"
+const SITE_URL = "https://你的用户名.github.io/kimi-recipe-studio";  // GitHub Pages 访问地址
+
+const isFileProtocol = () => location.protocol === "file:";
+const isRemoteAPI = () => /^https?:\/\//.test(API_BASE);
+const api = async (url, opts = {}) => {
+  let res;
+  try {
+    res = await fetch(API_BASE + url, {
+      headers: { "Content-Type": "application/json" },
+      credentials: isRemoteAPI() ? "include" : "same-origin",  // 跨域部署时须携带会话 Cookie
+      ...opts
+    });
+  } catch {
+    // 网络层失败：按实际部署方式给出具体提示
+    throw new Error(isFileProtocol()
+      ? `当前页面是直接双击打开的。请通过 GitHub Pages 地址访问：${SITE_URL}`
+      : isRemoteAPI()
+        ? "无法连接后端服务（部署于腾讯云云托管）。请检查云托管服务状态，或稍后重试"
+        : "无法连接后端服务。请确认 backend 已启动（cd backend && python app.py），并通过 http://localhost:3000 访问");
+  }
+  let data = null;
+  try { data = await res.json(); } catch { /* 服务端返回了非 JSON 内容（如代理错误页） */ }
+  if (!res.ok) {
+    throw new Error((data && data.error) || `服务返回异常（HTTP ${res.status}），请查看后端控制台日志`);
+  }
+  return data;
+};
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtDate = iso => new Date(iso).toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
+const fmtDateFull = iso => new Date(iso).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" });
+
+let currentUser = null;   // 登录状态（服务端会话）
+
+/* ---------- 视图切换 ---------- */
+document.querySelectorAll("[data-view]").forEach(el => {
+  el.addEventListener("click", e => {
+    e.preventDefault();
+    const view = el.dataset.view;
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    $(`#view-${view}`).classList.add("active");
+    document.querySelectorAll(".nav a[data-view]").forEach(a => a.classList.toggle("active", a.dataset.view === view));
+    if (view === "community") loadCommunity();
+    if (view === "settings") renderSettings();
+  });
+});
+
+/* ---------- 登录状态与顶栏 ---------- */
+async function refreshMe() {
+  try { currentUser = (await api("/api/auth/me")).user; }
+  catch { currentUser = null; }
+  renderNav();
+}
+function renderNav() {
+  const el = $("#nav-auth");
+  if (currentUser) {
+    el.innerHTML = `<span class="nav-user">👋 ${esc(currentUser.username)}</span>
+      <button class="btn-ghost btn-sm" id="btn-logout">退出</button>`;
+    $("#btn-logout").onclick = async () => { await api("/api/auth/logout", { method: "POST" }); await refreshMe(); };
+  } else {
+    el.innerHTML = `<button class="btn-ghost btn-sm" id="btn-login">登录</button>
+      <button class="btn-primary btn-sm" id="btn-register">注册</button>`;
+    $("#btn-login").onclick = () => openAuth("login");
+    $("#btn-register").onclick = () => openAuth("register");
+  }
+}
+
+/* ---------- 登录 / 注册弹窗 ---------- */
+let authMode = "login";
+function openAuth(mode) {
+  authMode = mode;
+  $("#auth-modal").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  syncAuthUI();
+  setTimeout(() => $("#a-username").focus(), 50);
+}
+function closeAuth() { $("#auth-modal").classList.add("hidden"); document.body.style.overflow = ""; }
+function syncAuthUI() {
+  const isLogin = authMode === "login";
+  document.querySelectorAll(".auth-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === authMode));
+  $("#a-confirm-field").classList.toggle("hidden", isLogin);
+  $("#auth-submit").textContent = isLogin ? "登 录" : "注册并登录";
+  $("#a-password").setAttribute("autocomplete", isLogin ? "current-password" : "new-password");
+  $("#auth-error").textContent = "";
+  $("#auth-form").reset();
+  $("#auth-switch").innerHTML = isLogin
+    ? `还没有账号？<a id="sw-to-reg">立即注册</a>`
+    : `已有账号？<a id="sw-to-login">直接登录</a>`;
+  $("#auth-switch a").onclick = () => { authMode = isLogin ? "register" : "login"; syncAuthUI(); };
+}
+document.querySelectorAll(".auth-tab").forEach(t => t.onclick = () => { authMode = t.dataset.tab; syncAuthUI(); });
+$("#auth-close").onclick = closeAuth;
+$("#auth-modal").addEventListener("click", e => { if (e.target === $("#auth-modal")) closeAuth(); });
+
+$("#auth-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const username = $("#a-username").value.trim();
+  const password = $("#a-password").value;
+  const err = $("#auth-error");
+  const btn = $("#auth-submit");
+  err.textContent = "";
+
+  // 客户端即时校验（成熟网站的 inline validation）
+  if (!/^[\w\u4e00-\u9fa5-]{2,20}$/.test(username)) { err.textContent = "用户名需为 2-20 位中英文、数字或下划线"; return; }
+  if (password.length < 6) { err.textContent = "密码至少 6 位"; return; }
+  if (authMode === "register" && password !== $("#a-confirm").value) { err.textContent = "两次输入的密码不一致"; return; }
+
+  btn.disabled = true; btn.textContent = "请稍候…";
+  try {
+    await api(`/api/auth/${authMode}`, { method: "POST", body: JSON.stringify({ username, password }) });
+    closeAuth();
+    await refreshMe();
+  } catch (ex) {
+    err.textContent = ex.message;          // 错误保留显示，不清空表单
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === "login" ? "登 录" : "注册并登录";  // 只恢复按钮，不动表单
+  }
+});
+
+/* ---------- 需要登录的操作统一入口 ---------- */
+function requireLogin() {
+  if (currentUser) return true;
+  openAuth("login");
+  $("#auth-error").textContent = "请先登录";
+  return false;
+}
+
+/* ---------- 食谱渲染 ---------- */
+function recipeHTML(r) {
+  return `
+    <div class="recipe-head"><div>
+      <h3>${esc(r.title)}</h3>
+      <p class="recipe-desc">${esc(r.description || "")}</p>
+    </div></div>
+    <div class="badges">
+      <span class="badge hot">⏱ 准备 ${esc(r.prep_time || "—")}</span>
+      <span class="badge hot">🔥 烹饪 ${esc(r.cook_time || "—")}</span>
+      <span class="badge">${esc(r.difficulty || "")}</span>
+      ${r.author ? `<span class="badge">by ${esc(r.author)}</span>` : ""}
+    </div>
+    <div class="recipe-cols">
+      <div>
+        <p class="sub-title">食材</p>
+        <ul class="ing-list">${(r.ingredients || []).map(i => `<li><b>${esc(i.name)}</b><span>${esc(i.amount)}</span></li>`).join("")}</ul>
+      </div>
+      <div>
+        <p class="sub-title">步骤</p>
+        <ol class="steps">${(r.steps || []).map(s => `<li>${esc(s)}</li>`).join("")}</ol>
+      </div>
+    </div>
+    ${(r.tips || []).length ? `<div class="tips"><p class="sub-title">小贴士</p><ul>${r.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}
+    ${r.changes ? `<div class="tips"><p class="sub-title">本次改良</p>${esc(r.changes)}</div>` : ""}
+  `;
+}
+
+/* ---------- AI 生成 ---------- */
+$("#btn-generate").addEventListener("click", async () => {
+  const btn = $("#btn-generate"), status = $("#generate-status");
+  const ingredients = $("#f-ingredients").value.trim();
+  if (!ingredients) { status.textContent = "请先填写食材～"; status.className = "status error"; return; }
+  btn.disabled = true; status.className = "status";
+  status.textContent = "Kimi 正在为你创作食谱，请稍候…";
+  try {
+    const data = await api("/api/generate", {
+      method: "POST",
+      body: JSON.stringify({
+        ingredients,
+        cuisine: $("#f-cuisine").value.trim(),
+        servings: $("#f-servings").value.trim(),
+        style: $("#f-style").value.trim(),
+        extra: $("#f-extra").value.trim()
+      })
+    });
+    window._generated = data.recipe;
+    const panel = $("#result-panel");
+    panel.innerHTML = recipeHTML(data.recipe) + `
+      <div class="result-actions">
+        <button class="btn-primary" id="btn-publish">📮 发布到社区</button>
+        <button class="btn-ghost" id="btn-regen">🔄 再生成一次</button>
+      </div>`;
+    $("#result-area").classList.remove("hidden");
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    status.textContent = "✅ 生成成功！满意的话可以发布到社区。";
+    $("#btn-publish").onclick = () => publishRecipe(data.recipe);
+    $("#btn-regen").onclick = () => btn.click();
+  } catch (e) {
+    status.textContent = "生成失败：" + e.message;
+    status.className = "status error";
+  } finally { btn.disabled = false; }
+});
+
+async function publishRecipe(recipe, parent_id = null) {
+  if (!requireLogin()) return;
+  try {
+    await api("/api/recipes", { method: "POST", body: JSON.stringify({ recipe, parent_id }) });
+    alert("🎉 已发布到社区！");
+    document.querySelector('[data-view="community"]').click();
+  } catch (e) {
+    if (e.message.includes("登录")) requireLogin(); else alert("发布失败：" + e.message);
+  }
+}
+
+/* ---------- 社区 ---------- */
+async function loadCommunity() {
+  const list = $("#recipe-list");
+  list.innerHTML = `<p class="muted">加载中…</p>`;
+  try {
+    const recipes = await api("/api/recipes");
+    if (!recipes.length) {
+      list.innerHTML = `<div class="empty-state">还没有食谱。<br>先去「AI 创作」生成一份，发布到这里吧 👨‍🍳</div>`;
+      return;
+    }
+    list.innerHTML = recipes.map(r => `
+      <div class="card" data-id="${r.id}">
+        ${r.parent_id ? `<span class="remix-tag">↳ 改良版</span>` : ""}
+        <h4>${esc(r.title)}</h4>
+        <p class="card-desc">${esc(r.description || "")}</p>
+        <div class="card-meta">
+          <span>by ${esc(r.author)}</span><span>❤ ${r.likes || 0}</span>
+          <span>💬 ${r.comments || 0}</span><span>${fmtDate(r.created_at)}</span>
+        </div>
+      </div>`).join("");
+    list.querySelectorAll(".card").forEach(c => c.addEventListener("click", () => openDetail(c.dataset.id)));
+  } catch (e) {
+    list.innerHTML = `<div class="empty-state">加载失败：${esc(e.message)}</div>`;
+  }
+}
+
+/* ---------- 详情弹层 ---------- */
+async function openDetail(id) {
+  try {
+    const r = await api(`/api/recipes/${id}`);
+    const body = $("#modal-body");
+    body.innerHTML = recipeHTML(r) + `
+      <div class="result-actions">
+        <button class="btn-ghost btn-accent" id="d-like">❤ 点赞 (${r.likes || 0})</button>
+        <button class="btn-ghost" id="d-fork">🍴 改良再创作</button>
+        ${r.parent ? `<button class="btn-ghost" id="d-parent">↩ 查看原版</button>` : ""}
+      </div>
+      <div class="remix-box" id="remix-box" style="display:none">
+        <p class="sub-title">🤖 让 Kimi 帮你改良</p>
+        <textarea id="remix-input" rows="2" placeholder="想怎么改？例如：做成低脂版 / 换成空气炸锅 / 加辣…"></textarea>
+        <div class="result-actions"><button class="btn-primary" id="btn-remix">✨ 开始改良</button></div>
+        <p id="remix-status" class="status"></p>
+      </div>
+      <div class="comments">
+        <p class="sub-title">评论 (${r.comments.length})</p>
+        <div id="comment-list">
+          ${r.comments.map(c => `<div class="comment"><b>${esc(c.author)}</b><time>${fmtDate(c.created_at)}</time><br>${esc(c.text)}</div>`).join("") || `<p class="muted">还没有评论，来抢沙发～</p>`}
+        </div>
+        <div class="comment-form">
+          <input id="comment-input" placeholder="${currentUser ? "写下你的想法或改良建议…" : "登录后参与评论…"}">
+          <button class="btn-ghost btn-accent" id="btn-comment">发送</button>
+        </div>
+      </div>
+      ${r.children && r.children.length ? `
+        <div class="comments">
+          <p class="sub-title">这份食谱的改良版 (${r.children.length})</p>
+          ${r.children.map(ch => `<div class="comment" style="cursor:pointer" data-goto="${ch.id}">🍴 <b>${esc(ch.title)}</b> <span class="muted">by ${esc(ch.author)}</span></div>`).join("")}
+        </div>` : ""}
+    `;
+
+    $("#d-like").onclick = async () => {
+      const d = await api(`/api/recipes/${id}/like`, { method: "POST" });
+      $("#d-like").textContent = `❤ 点赞 (${d.likes})`;
+    };
+    $("#d-fork").onclick = () => {
+      const box = $("#remix-box");
+      box.style.display = box.style.display === "none" ? "block" : "none";
+    };
+    if (r.parent) $("#d-parent").onclick = () => openDetail(r.parent.id);
+
+    $("#btn-comment").onclick = async () => {
+      if (!requireLogin()) return;
+      const text = $("#comment-input").value.trim();
+      if (!text) return;
+      try {
+        await api(`/api/recipes/${id}/comments`, { method: "POST", body: JSON.stringify({ text }) });
+        openDetail(id);
+      } catch (e) { if (e.message.includes("登录")) requireLogin(); }
+    };
+
+    $("#btn-remix").onclick = async () => {
+      if (!requireLogin()) return;
+      const btn = $("#btn-remix"), status = $("#remix-status");
+      btn.disabled = true; status.className = "status"; status.textContent = "Kimi 正在改良这份食谱…";
+      try {
+        const data = await api("/api/remix", {
+          method: "POST",
+          body: JSON.stringify({ id, suggestion: $("#remix-input").value.trim() })
+        });
+        const saved = await api("/api/recipes", { method: "POST", body: JSON.stringify({ recipe: data.recipe, parent_id: id }) });
+        openDetail(saved.id);
+      } catch (e) {
+        status.textContent = "改良失败：" + e.message;
+        status.className = "status error";
+        if (e.message.includes("登录")) requireLogin();
+      } finally { btn.disabled = false; }
+    };
+
+    body.querySelectorAll("[data-goto]").forEach(el => el.addEventListener("click", () => openDetail(el.dataset.goto)));
+    $("#modal").classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  } catch (e) { alert("加载失败：" + e.message); }
+}
+$("#modal-close").onclick = closeModal;
+$("#modal").addEventListener("click", e => { if (e.target === $("#modal")) closeModal(); });
+function closeModal() { $("#modal").classList.add("hidden"); document.body.style.overflow = ""; }
+
+/* ---------- 设置（账号信息） ---------- */
+async function renderSettings() {
+  const box = $("#account-box");
+  try {
+    const s = await api("/api/settings");
+    $("#server-status").textContent = s.has_key
+      ? `✅ 服务端已配置 API Key（模型：${s.model}）`
+      : "⚠️ 服务端未配置 API Key，AI 功能不可用";
+  } catch { /* 忽略 */ }
+  if (currentUser) {
+    box.innerHTML = `
+      <div class="account-card">
+        <div class="account-avatar">${esc(currentUser.username[0].toUpperCase())}</div>
+        <div>
+          <div class="account-name">${esc(currentUser.username)}</div>
+          <div class="account-since">加入于 ${fmtDateFull(currentUser.created_at)}</div>
+        </div>
+      </div>`;
+  } else {
+    box.innerHTML = `<p class="muted" style="margin-bottom:16px">登录后可发布食谱、评论和改良他人作品。</p>
+      <button class="btn-primary" id="btn-settings-login">登录 / 注册</button>`;
+    $("#btn-settings-login").onclick = () => openAuth("login");
+  }
+}
+
+/* 后端连接状态横幅 */
+async function checkBackend() {
+  const bar = $("#backend-warning");
+  try {
+    await api("/api/settings");
+    bar.classList.add("hidden");
+  } catch (e) {
+    bar.textContent = "⚠️ " + e.message;
+    bar.classList.remove("hidden");
+  }
+}
+checkBackend();
+
+/* 初始加载 */
+refreshMe();
+</script>
 </body>
 </html>
