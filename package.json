@@ -1,0 +1,12 @@
+{
+  "name": "kimi-recipe-studio",
+  "version": "1.0.0",
+  "description": "AI 食谱创作与共创社区 — 基于 Kimi API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kimi 食谱工坊 — AI 食谱共创社区</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="#" data-view="create">Kimi <em>食谱工坊</em></a>
+    <nav class="nav">
+      <a href="#" data-view="create" class="active">AI 创作</a>
+      <a href="#" data-view="community">社区</a>
+      <a href="#" data-view="settings">设置</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ========== 视图：AI 创作 ========== -->
+  <section id="view-create" class="view active">
+    <div class="hero">
+      <h1>说出你的食材，<br>剩下的交给 Kimi。</h1>
+      <p class="hero-sub">AI 生成原创食谱 · 一键发布社区 · 众人接力改良</p>
+    </div>
+
+    <div class="panel form-panel">
+      <div class="form-grid">
+        <label class="field field-wide">
+          <span>手头有什么食材？<i>必填</i></span>
+          <textarea id="f-ingredients" rows="2" placeholder="例如：鸡胸肉、西兰花、蒜、生抽…"></textarea>
+        </label>
+        <label class="field">
+          <span>菜系 / 口味</span>
+          <input id="f-cuisine" placeholder="例如：川菜、清淡、日式…">
+        </label>
+        <label class="field">
+          <span>份量</span>
+          <input id="f-servings" placeholder="例如：2人份">
+        </label>
+        <label class="field">
+          <span>风格</span>
+          <input id="f-style" placeholder="例如：减脂餐、家常快手、宴客">
+        </label>
+        <label class="field field-wide">
+          <span>其他要求</span>
+          <input id="f-extra" placeholder="例如：不用辣、少油、能提前备好…">
+        </label>
+      </div>
+      <button id="btn-generate" class="btn-primary">✨ 生成食谱</button>
+      <p id="generate-status" class="status"></p>
+    </div>
+
+    <div id="result-area" class="hidden">
+      <div class="panel result-panel" id="result-panel"><!-- JS 填充 --></div>
+    </div>
+  </section>
+
+  <!-- ========== 视图：社区 ========== -->
+  <section id="view-community" class="view">
+    <div class="page-head">
+      <h2>社区食谱</h2>
+      <p class="muted">每一份食谱都可以被继续改良 — 这正是它有趣的地方。</p>
+    </div>
+    <div id="recipe-list" class="recipe-grid"><!-- JS 填充 --></div>
+  </section>
+
+  <!-- ========== 视图：设置 ========== -->
+  <section id="view-settings" class="view">
+    <div class="page-head">
+      <h2>设置</h2>
+      <p class="muted">配置 Kimi API，解锁 AI 创作能力。</p>
+    </div>
+    <div class="panel form-panel settings-panel">
+      <label class="field field-wide">
+        <span>Kimi API Key</span>
+        <input id="s-key" type="password" placeholder="sk-…（从 platform.moonshot.cn 获取）">
+      </label>
+      <label class="field">
+        <span>模型</span>
+        <input id="s-model" placeholder="kimi-latest">
+      </label>
+      <label class="field field-wide">
+        <span>API 地址</span>
+        <input id="s-base" placeholder="https://api.moonshot.cn/v1">
+      </label>
+      <label class="field">
+        <span>你的昵称</span>
+        <input id="s-author" placeholder="匿名厨友">
+      </label>
+      <button id="btn-save-settings" class="btn-primary">保存设置</button>
+      <p id="settings-status" class="status"></p>
+    </div>
+  </section>
+
+</main>
+
+<!-- 食谱详情弹层 -->
+<div id="modal" class="modal hidden">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close">×</button>
+    <div id="modal-body"><!-- JS 填充 --></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>Kimi 食谱工坊 · 简约 · 共创 · 再改良</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
