@@ -65,7 +65,7 @@ async function callKimi(messages, env) {
     body: JSON.stringify({
       model: env.KIMI_MODEL,
       messages,
-      temperature: 0.7,
+      temperature: 1,
       response_format: { type: "json_object" }
     })
   });
